@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if isBuyed %}
+    <p>question will send to your email soon</p>
+{% else %}
+    <div class="container">
+        <h1>Buy Questions Form</h1>
+        <form action="{% url 'buyQuestion' %}" method="post">
+            {% csrf_token %}
+        <div class="form-group">
+            Dificulty Level {{ form.difficultyLevel }}
+        </div>
+        <div class="form-group">
+            Team Name {{ form.teamName }}
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary" type="submit" value="Submit">
+        </div>
+        </form>
+    </div>
+{% endif %}
+{% endblock content%}

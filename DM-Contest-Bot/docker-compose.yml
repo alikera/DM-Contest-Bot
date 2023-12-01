@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/postgres_db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    container_name: ut_dm_contest_postgres_db
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - 6379:6379
+  
+  rabbitmq:
+      hostname: rabbit:3.12.1
+      image: rabbitmq:3.6.9
+      environment:
+          - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+          - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      container_name: ut_dm_contest_rabbitmq
+      ports:
+          - "5672:5672"
+
+  app:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    image: app:ut_dm_contest
+    container_name: ut_dm_contest_app
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+
+  celery:
+    restart: always
+    build:
+      context: .
+    command: celery -A core worker -l INFO
+    volumes:
+      - .:/django
+    container_name: ut_dm_contest_celery_worker
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+      - app

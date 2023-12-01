@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Score Board</title>
+{% endblock %}
+
+<!-- {% block links %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/score.board.style.css' %}"/>
+{% endblock %} -->
+
+{% block style %}
+    <style>
+        .countdown {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 48px;
+            padding: 20px;
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+
+        thead {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:hover {
+            background-color: #eaeaea;
+        }
+
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="countdown" id="countdown">1:00:00</div>
+
+    <table style="width: 300px;">
+        <tr>
+            <th>Team Name</th>
+            <th>Total Score</th>
+            <th>Budget</th>
+        </tr>
+        {% for score in scores %}
+            <tr>
+                <td>{{ score.team.name }}</td>
+                <td>{{ score.total_score }} </td>
+                <td>{{ score.team.budget }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    {% block scripts %}
+        <script>
+            function startCountdown(duration, display) {
+                var timer = duration, hours, minutes, seconds;
+
+                var countdown = setInterval(function() {
+                    hours = parseInt(timer / 3600, 10);
+                    minutes = parseInt((timer % 3600) / 60, 10);
+                    seconds = parseInt((timer % 3600) % 60, 10);
+
+                    hours = hours < 10 ? "0" + hours : hours;
+                    minutes = minutes < 10 ? "0" + minutes : minutes;
+                    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                    display.textContent = hours + ":" + minutes + ":" + seconds;
+
+                    if (--timer < 0) {
+                        clearInterval(countdown);
+                        display.textContent = "Time's up!";
+                    }
+                }, 1000);
+            }
+
+            var countdownDisplay = document.getElementById("countdown");
+            var countdownDuration = 3600;
+            startCountdown(countdownDuration, countdownDisplay);            
+        </script>
+    {% endblock %}
+{% endblock %}
